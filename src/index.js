@@ -6,43 +6,15 @@ const rl = readline.createInterface({
 });
 
 const PERSONAGENS = [
-  {
-    nome: "Mario",
-    velocidade: 4,
-    manobrabilidade: 3,
-    poder: 3,
-  },
-  {
-    nome: "Peach",
-    velocidade: 3,
-    manobrabilidade: 4,
-    poder: 2,
-  },
-  {
-    nome: "Yoshi",
-    velocidade: 2,
-    manobrabilidade: 4,
-    poder: 3,
-  },
-  {
-    nome: "Bowser",
-    velocidade: 5,
-    manobrabilidade: 2,
-    poder: 5,
-  },
-  {
-    nome: "Luigi",
-    velocidade: 3,
-    manobrabilidade: 4,
-    poder: 4,
-  },
-  {
-    nome: "Donkey Kong",
-    velocidade: 2,
-    manobrabilidade: 2,
-    poder: 5,
-  },
+  { nome: "Mario", velocidade: 4, manobrabilidade: 3, poder: 3 },
+  { nome: "Peach", velocidade: 3, manobrabilidade: 4, poder: 2 },
+  { nome: "Yoshi", velocidade: 2, manobrabilidade: 4, poder: 3 },
+  { nome: "Bowser", velocidade: 5, manobrabilidade: 2, poder: 5 },
+  { nome: "Luigi", velocidade: 3, manobrabilidade: 4, poder: 4 },
+  { nome: "Donkey Kong", velocidade: 2, manobrabilidade: 2, poder: 5 },
 ];
+
+const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function rolarDado() {
   return Math.floor(Math.random() * 6) + 1;
@@ -63,12 +35,15 @@ function registrarResultado(nomeJogador, tipoBloco, resultadoDado, valorAtributo
   );
 }
 
-function jogarCorrida(personagem1, personagem2) {
+async function jogarCorrida(personagem1, personagem2) {
     for (let rodada = 1; rodada <= 5; rodada++) {
         console.log(`\n🏁 Rodada ${rodada}`);
     
         const bloco = sortearBloco();
         console.log(`Bloco: ${bloco}`);
+
+        console.log("\nA corrida está acontecendo...");
+        await esperar(2000);
     
         const resultadoDado1 = rolarDado();
         const resultadoDado2 = rolarDado();
@@ -88,7 +63,7 @@ function jogarCorrida(personagem1, personagem2) {
         registrarResultado(personagem2.nome, atributo, resultadoDado2, personagem2[atributo]);
         
         if (bloco === "CONFRONTO") {
-          console.log(`${personagem1.nome} confrontou com ${personagem2.nome}! 🥊`);
+          console.log(`\n${personagem1.nome} confrontou com ${personagem2.nome}! 🥊`);
           
           if (habilidadeTotal1 > habilidadeTotal2 && personagem2.pontos > 0) {
             console.log(
@@ -105,15 +80,16 @@ function jogarCorrida(personagem1, personagem2) {
           }
         } else {
           if (habilidadeTotal1 > habilidadeTotal2) {
-            console.log(`${personagem1.nome} marcou um ponto!`);
+            console.log(`\n${personagem1.nome} marcou um ponto!`);
             personagem1.pontos++;
           } else if (habilidadeTotal2 > habilidadeTotal1) {
-            console.log(`${personagem2.nome} marcou um ponto!`);
+            console.log(`\n${personagem2.nome} marcou um ponto!`);
             personagem2.pontos++;
           }
         }
         
         console.log("-----------------------------");
+        await esperar(1000);
     }
 }
 
@@ -127,7 +103,7 @@ function declararVencedor(personagem1, personagem2) {
     } else if (personagem2.pontos > personagem1.pontos) {
       console.log(`\n${personagem2.nome} venceu a corrida! Parabéns! 🏆`);
     } else {
-      console.log("A corrida terminou em empate");
+      console.log("\nA corrida terminou em empate");
     }
 }
 
@@ -143,18 +119,22 @@ async function principal() {
 
   const escolherPersonagem = (nomeJogador) => {
     return new Promise((resolve) => {
-      rl.question(`Escolha o personagem para o ${nomeJogador} (digite o número): `, (resposta) => {
-        const indiceEscolhido = parseInt(resposta) - 1;
-        const personagemEscolhido = PERSONAGENS[indiceEscolhido];
-
-        if (personagemEscolhido) {
-          console.log(`${nomeJogador} escolheu ${personagemEscolhido.nome}!`);
-          resolve({ ...personagemEscolhido, pontos: 0 });
-        } else {
-          console.log("Opção inválida! Tente novamente.");
-          resolve(escolherPersonagem(nomeJogador));
-        }
-      });
+      let personagemEscolhido = null;
+      const perguntar = () => {
+        rl.question(`Escolha o personagem para o ${nomeJogador} (digite o número): `, (resposta) => {
+          const indiceEscolhido = parseInt(resposta) - 1;
+          
+          if (indiceEscolhido >= 0 && indiceEscolhido < PERSONAGENS.length) {
+            personagemEscolhido = PERSONAGENS[indiceEscolhido];
+            console.log(`${nomeJogador} escolheu ${personagemEscolhido.nome}!`);
+            resolve({ ...personagemEscolhido, pontos: 0 });
+          } else {
+            console.log("Opção inválida! Tente novamente.");
+            perguntar();
+          }
+        });
+      }
+      perguntar();
     });
   };
 
@@ -167,7 +147,7 @@ async function principal() {
     `\n🏁🚨 Corrida entre ${jogador1.nome} e ${jogador2.nome} começando...\n`
   );
 
-  jogarCorrida(jogador1, jogador2);
+  await jogarCorrida(jogador1, jogador2);
   declararVencedor(jogador1, jogador2);
 }
 
