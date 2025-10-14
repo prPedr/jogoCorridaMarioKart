@@ -72,4 +72,4 @@ node seu_arquivo.js
 ## 🏁 AUTOR
 
 Projeto desenvolvido para fins didáticos e de simulação.  
-Feito com 💛 para fins de estudo.
+Feito com para fins de estudo.
