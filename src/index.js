@@ -1,5 +1,3 @@
-// --- ESTRUTURA DE DADOS ---
-// Os objetos de jogador já estavam com um bom padrão.
 const jogador1 = {
   nome: "Mario",
   velocidade: 4,
@@ -16,7 +14,6 @@ const jogador2 = {
   pontos: 0,
 };
 
-// --- FUNÇÕES AUXILIARES ---
 function rolarDado() {
   return Math.floor(Math.random() * 6) + 1;
 }
@@ -28,7 +25,6 @@ function sortearBloco() {
   return "CONFRONTO";
 }
 
-// Função de log com nomes em português
 function registrarResultado(nomeJogador, tipoBloco, resultadoDado, valorAtributo) {
   console.log(
     `${nomeJogador} 🎲 rolou um dado de ${tipoBloco} ${resultadoDado} + ${valorAtributo} = ${
@@ -37,8 +33,6 @@ function registrarResultado(nomeJogador, tipoBloco, resultadoDado, valorAtributo
   );
 }
 
-
-// --- LÓGICA PRINCIPAL DA CORRIDA ---
 function jogarCorrida(personagem1, personagem2) {
   for (let rodada = 1; rodada <= 5; rodada++) {
     console.log(`\n🏁 Rodada ${rodada}`);
@@ -49,7 +43,6 @@ function jogarCorrida(personagem1, personagem2) {
     const resultadoDado1 = rolarDado();
     const resultadoDado2 = rolarDado();
 
-    // Mapeamento de blocos para os atributos correspondentes.
     const atributosDosBlocos = {
         "RETA": "velocidade",
         "CURVA": "manobrabilidade",
@@ -57,15 +50,13 @@ function jogarCorrida(personagem1, personagem2) {
     };
 
     const atributo = atributosDosBlocos[bloco];
-    
-    // Calcula a habilidade total para ambos os jogadores.
+
     let habilidadeTotal1 = resultadoDado1 + personagem1[atributo];
     let habilidadeTotal2 = resultadoDado2 + personagem2[atributo];
 
     registrarResultado(personagem1.nome, atributo, resultadoDado1, personagem1[atributo]);
     registrarResultado(personagem2.nome, atributo, resultadoDado2, personagem2[atributo]);
-    
-    // Lógica para determinar o vencedor do round ou do confronto.
+
     if (bloco === "CONFRONTO") {
       console.log(`${personagem1.nome} confrontou com ${personagem2.nome}! 🥊`);
       
@@ -83,7 +74,6 @@ function jogarCorrida(personagem1, personagem2) {
         console.log("Confronto empatado! Nenhum ponto foi perdido.");
       }
     } else {
-      // Adiciona pontos para o vencedor do round (RETA ou CURVA)
       if (habilidadeTotal1 > habilidadeTotal2) {
         console.log(`${personagem1.nome} marcou um ponto!`);
         personagem1.pontos++;
@@ -111,7 +101,6 @@ function declararVencedor(personagem1, personagem2) {
   }
 }
 
-// --- EXECUÇÃO DO PROGRAMA ---
 (function principal() {
   console.log(
     `🏁🚨 Corrida entre ${jogador1.nome} e ${jogador2.nome} começando...\n`
