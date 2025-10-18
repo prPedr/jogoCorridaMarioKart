@@ -19,13 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const p1SelectionText = document.getElementById('p1-selection');
     const p2SelectionText = document.getElementById('p2-selection');
     const selectionTitle = document.getElementById('selection-title');
+    const playAgainBtn = document.getElementById('play-again-btn');
+
+    const audioSelect = document.getElementById('audio-select');
+    const audioPoint = document.getElementById('audio-point');
+    const audioWin = document.getElementById('audio-win');
 
     const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     function createCharacterCards() {
+        characterGrid.innerHTML = "";
         PERSONAGENS.forEach(char => {
             const card = document.createElement('div');
             card.classList.add('character-card');
+            card.dataset.charName = char.nome;
             card.innerHTML = `<img src="${char.img}" alt="${char.nome}"><p>${char.nome}</p>`;
             card.addEventListener('click', () => selectCharacter(char, card));
             characterGrid.appendChild(card);
@@ -38,14 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
             p1SelectionText.textContent = player1.nome;
             card.classList.add('selected-p1');
             currentPlayerSelection = 2;
-            selectionTitle.textContent = "PLAYER 2: CHOOSE YOUR CHARACTER";
+            selectionTitle.textContent = "PLAYER 2: CHOOSE YOUR RACER";
+            audioSelect.play();
         } else if (currentPlayerSelection === 2 && character.nome !== player1.nome) {
             player2 = { ...character, pontos: 0 };
             p2SelectionText.textContent = player2.nome;
             card.classList.add('selected-p2');
             currentPlayerSelection = 3;
-
-            setTimeout(startRace, 1000);
+            audioSelect.play();
+            setTimeout(startRace, 1500);
         }
     }
 
@@ -66,26 +74,19 @@ document.addEventListener('DOMContentLoaded', () => {
     async function runRaceSimulation() {
         const raceLog = document.getElementById('race-log');
         const roundTitle = document.getElementById('round-title');
-
         const tiposDePista = ["RETA", "CURVA", "CONFRONTO"];
-        const atributos = {
-            "RETA": "velocidade",
-            "CURVA": "manobrabilidade",
-            "CONFRONTO": "poder"
-        };
+        const atributos = { "RETA": "velocidade", "CURVA": "manobrabilidade", "CONFRONTO": "poder" };
 
         for (let rodada = 1; rodada <= 5; rodada++) {
             roundTitle.textContent = `--- RODADA ${rodada} ---`;
-
             const pista = tiposDePista[Math.floor(Math.random() * tiposDePista.length)];
             const atributoDaVez = atributos[pista];
-
+            
             raceLog.innerHTML = `Pista da rodada: ${pista}!\nTestando ${atributoDaVez}...`;
             await esperar(2500);
 
             const p1Roll = Math.floor(Math.random() * 6) + 1;
             const p2Roll = Math.floor(Math.random() * 6) + 1;
-
             const p1Skill = player1[atributoDaVez] + p1Roll;
             const p2Skill = player2[atributoDaVez] + p2Roll;
 
@@ -93,28 +94,26 @@ document.addEventListener('DOMContentLoaded', () => {
             logMessage += `🎲 ${player1.nome} (${atributoDaVez}: ${player1[atributoDaVez]} + ${p1Roll}) = ${p1Skill}\n`;
             logMessage += `🎲 ${player2.nome} (${atributoDaVez}: ${player2[atributoDaVez]} + ${p2Roll}) = ${p2Skill}\n\n`;
 
+            let scored = false;
             if (pista === "CONFRONTO") {
                 if (p1Skill > p2Skill && player2.pontos > 0) {
                     logMessage += `🥊 ${player1.nome} venceu o confronto! ${player2.nome} perdeu 1 ponto.`;
-                    player2.pontos--;
+                    player2.pontos--; scored = true;
                 } else if (p2Skill > p1Skill && player1.pontos > 0) {
                     logMessage += `🥊 ${player2.nome} venceu o confronto! ${player1.nome} perdeu 1 ponto.`;
-                    player1.pontos--;
-                } else {
-                    logMessage += `💥 Confronto empatado!`;
-                }
-            } else { // Reta ou Curva
+                    player1.pontos--; scored = true;
+                } else { logMessage += `💥 Confronto empatado!`; }
+            } else {
                 if (p1Skill > p2Skill) {
                     logMessage += `🏆 ${player1.nome} venceu e marcou 1 ponto!`;
-                    player1.pontos++;
+                    player1.pontos++; scored = true;
                 } else if (p2Skill > p1Skill) {
                     logMessage += `🏆 ${player2.nome} venceu e marcou 1 ponto!`;
-                    player2.pontos++;
-                } else {
-                    logMessage += `💥 Empate! Ninguém marcou pontos.`;
-                }
+                    player2.pontos++; scored = true;
+                } else { logMessage += `💥 Empate! Ninguém marcou pontos.`; }
             }
-
+            
+            if (scored) audioPoint.play();
             raceLog.innerHTML = logMessage;
             updatePlayerDisplays();
             await esperar(4000);
@@ -127,19 +126,42 @@ document.addEventListener('DOMContentLoaded', () => {
         raceScreen.classList.add('hidden');
         winnerScreen.classList.remove('hidden');
 
+        const winnerImg = document.getElementById('winner-img');
+        const winnerName = document.getElementById('winner-name');
         const announcement = document.getElementById('winner-announcement');
+        
+        audioWin.play();
+
         if (player1.pontos > player2.pontos) {
-            announcement.textContent = `${player1.nome} VENCEU A CORRIDA!`;
+            winnerImg.src = player1.img;
+            winnerName.textContent = player1.nome;
+            announcement.textContent = "VENCEU A CORRIDA!";
         } else if (player2.pontos > player1.pontos) {
-            announcement.textContent = `${player2.nome} VENCEU A CORRIDA!`;
+            winnerImg.src = player2.img;
+            winnerName.textContent = player2.nome;
+            announcement.textContent = "VENCEU A CORRIDA!";
         } else {
-            announcement.textContent = "A CORRIDA TERMINOU EM EMPATE!";
+            winnerImg.src = "./docs/header.gif";
+            winnerName.textContent = "EMPATE!";
+            announcement.textContent = "UMA DISPUTA ACIRRADA!";
         }
     }
 
-    document.getElementById('play-again-btn').addEventListener('click', () => {
-        location.reload();
-    });
+    function resetGame() {
+        player1 = null;
+        player2 = null;
+        currentPlayerSelection = 1;
+        
+        p1SelectionText.textContent = "...";
+        p2SelectionText.textContent = "...";
+        selectionTitle.textContent = "PLAYER 1: SELECT YOUR RACER";
+        
+        winnerScreen.classList.add('hidden');
+        selectionScreen.classList.remove('hidden');
 
+        createCharacterCards();
+    }
+    
+    playAgainBtn.addEventListener('click', resetGame);
     createCharacterCards();
 });
