@@ -43,13 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
             player2 = { ...character, pontos: 0 };
             p2SelectionText.textContent = player2.nome;
             card.classList.add('selected-p2');
-            currentPlayerSelection = 3; 
-            
+            currentPlayerSelection = 3;
+
             setTimeout(startRace, 1000);
         }
     }
 
-    // --- LÓGICA DA CORRIDA ---
     async function startRace() {
         selectionScreen.classList.add('hidden');
         raceScreen.classList.remove('hidden');
@@ -68,29 +67,57 @@ document.addEventListener('DOMContentLoaded', () => {
         const raceLog = document.getElementById('race-log');
         const roundTitle = document.getElementById('round-title');
 
+        const tiposDePista = ["RETA", "CURVA", "CONFRONTO"];
+        const atributos = {
+            "RETA": "velocidade",
+            "CURVA": "manobrabilidade",
+            "CONFRONTO": "poder"
+        };
+
         for (let rodada = 1; rodada <= 5; rodada++) {
             roundTitle.textContent = `--- RODADA ${rodada} ---`;
-            raceLog.innerHTML = `A corrida está acontecendo...`;
-            await esperar(2000);
+
+            const pista = tiposDePista[Math.floor(Math.random() * tiposDePista.length)];
+            const atributoDaVez = atributos[pista];
+
+            raceLog.innerHTML = `Pista da rodada: ${pista}!\nTestando ${atributoDaVez}...`;
+            await esperar(2500);
 
             const p1Roll = Math.floor(Math.random() * 6) + 1;
             const p2Roll = Math.floor(Math.random() * 6) + 1;
-            
-            let logMessage = `🎲 ${player1.nome} rolou ${p1Roll}\n🎲 ${player2.nome} rolou ${p2Roll}\n\n`;
 
-            if (p1Roll > p2Roll) {
-                logMessage += `🏆 ${player1.nome} venceu a rodada e marcou 1 ponto!`;
-                player1.pontos++;
-            } else if (p2Roll > p1Roll) {
-                logMessage += `🏆 ${player2.nome} venceu a rodada e marcou 1 ponto!`;
-                player2.pontos++;
-            } else {
-                logMessage += `💥 Empate na rodada! Ninguém marcou pontos.`;
+            const p1Skill = player1[atributoDaVez] + p1Roll;
+            const p2Skill = player2[atributoDaVez] + p2Roll;
+
+            let logMessage = `PISTA: ${pista}\n`;
+            logMessage += `🎲 ${player1.nome} (${atributoDaVez}: ${player1[atributoDaVez]} + ${p1Roll}) = ${p1Skill}\n`;
+            logMessage += `🎲 ${player2.nome} (${atributoDaVez}: ${player2[atributoDaVez]} + ${p2Roll}) = ${p2Skill}\n\n`;
+
+            if (pista === "CONFRONTO") {
+                if (p1Skill > p2Skill && player2.pontos > 0) {
+                    logMessage += `🥊 ${player1.nome} venceu o confronto! ${player2.nome} perdeu 1 ponto.`;
+                    player2.pontos--;
+                } else if (p2Skill > p1Skill && player1.pontos > 0) {
+                    logMessage += `🥊 ${player2.nome} venceu o confronto! ${player1.nome} perdeu 1 ponto.`;
+                    player1.pontos--;
+                } else {
+                    logMessage += `💥 Confronto empatado!`;
+                }
+            } else { // Reta ou Curva
+                if (p1Skill > p2Skill) {
+                    logMessage += `🏆 ${player1.nome} venceu e marcou 1 ponto!`;
+                    player1.pontos++;
+                } else if (p2Skill > p1Skill) {
+                    logMessage += `🏆 ${player2.nome} venceu e marcou 1 ponto!`;
+                    player2.pontos++;
+                } else {
+                    logMessage += `💥 Empate! Ninguém marcou pontos.`;
+                }
             }
-            
+
             raceLog.innerHTML = logMessage;
             updatePlayerDisplays();
-            await esperar(3000);
+            await esperar(4000);
         }
 
         declareWinner();
