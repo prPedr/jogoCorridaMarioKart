@@ -103,6 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
             logMessage += `🎲 ${player2.nome} (${atributoDaVez}: ${player2[atributoDaVez]} + ${p2Roll}) = ${p2Skill}\n\n`;
 
             let scored = false;
+            let tied = false;
+
             if (pista === "CONFRONTO") {
                 if (p1Skill > p2Skill && player2.pontos > 0) {
                     logMessage += `🥊 ${player1.nome} venceu o confronto! ${player2.nome} perdeu 1 ponto.`;
@@ -110,18 +112,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (p2Skill > p1Skill && player1.pontos > 0) {
                     logMessage += `🥊 ${player2.nome} venceu o confronto! ${player1.nome} perdeu 1 ponto.`;
                     player1.pontos--; scored = true;
-                } else { logMessage += `💥 Confronto empatado!`; }
-            } else {
+                } else {
+                    logMessage += `💥 Confronto empatado!`;
+                    tied = true;
+                }
+            } else { // Reta ou Curva
                 if (p1Skill > p2Skill) {
                     logMessage += `🏆 ${player1.nome} venceu e marcou 1 ponto!`;
                     player1.pontos++; scored = true;
                 } else if (p2Skill > p1Skill) {
                     logMessage += `🏆 ${player2.nome} venceu e marcou 1 ponto!`;
                     player2.pontos++; scored = true;
-                } else { logMessage += `💥 Empate! Ninguém marcou pontos.`; }
+                } else {
+                    logMessage += `💥 Empate! Ninguém marcou pontos.`;
+                    tied = true;
+                }
             }
             
             if (scored) playAudio(audioPoint);
+            if (tied) playAudio(audioTie);
+            
             raceLog.innerHTML = logMessage;
             updatePlayerDisplays();
             await esperar(4000);
