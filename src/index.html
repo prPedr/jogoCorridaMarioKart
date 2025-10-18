@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Kart.JS - A Corrida</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>MARIO KART.JS</h1>
+
+        <div id="selection-screen" class="screen">
+            <h2 id="selection-title">SELECT YOUR PLAYER</h2>
+            <div id="character-grid" class="character-grid">
+                </div>
+            <div class="selection-status">
+                <p>PLAYER 1: <span id="p1-selection">...</span></p>
+                <p>PLAYER 2: <span id="p2-selection">...</span></p>
+            </div>
+        </div>
+
+        <div id="race-screen" class="screen hidden">
+            <h2 id="round-title"></h2>
+            <div class="race-display">
+                <div class="player-info" id="player1-display">
+                    </div>
+                <div class="vs-separator">VS</div>
+                <div class="player-info" id="player2-display">
+                    </div>
+            </div>
+            <div id="race-log" class="race-log">
+                </div>
+        </div>
+
+        <div id="winner-screen" class="screen hidden">
+            <h2>RACE OVER</h2>
+            <p id="winner-announcement"></p>
+            <button id="play-again-btn">JOGAR NOVAMENTE</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
