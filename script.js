@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioSelect = document.getElementById('audio-select');
     const audioPoint = document.getElementById('audio-point');
     const audioWin = document.getElementById('audio-win');
+    const audioTie = document.getElementById('audio-tie');
 
     const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -137,17 +138,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const winnerName = document.getElementById('winner-name');
         const announcement = document.getElementById('winner-announcement');
         
-        playAudio(audioWin);
-
         if (player1.pontos > player2.pontos) {
+            playAudio(audioWin);
             winnerImg.src = player1.img;
             winnerName.textContent = player1.nome;
             announcement.textContent = "VENCEU A CORRIDA!";
         } else if (player2.pontos > player1.pontos) {
+            playAudio(audioWin);
             winnerImg.src = player2.img;
             winnerName.textContent = player2.nome;
             announcement.textContent = "VENCEU A CORRIDA!";
         } else {
+            playAudio(audioTie);
             winnerImg.src = "./docs/header.gif";
             winnerName.textContent = "EMPATE!";
             announcement.textContent = "UMA DISPUTA ACIRRADA!";
