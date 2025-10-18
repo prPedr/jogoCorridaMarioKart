@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+    function playAudio(audioElement) {
+        audioElement.currentTime = 0;
+        audioElement.play();
+    }
+
     function createCharacterCards() {
         characterGrid.innerHTML = "";
         PERSONAGENS.forEach(char => {
@@ -40,19 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectCharacter(character, card) {
+        if (card.classList.contains('selected-p1')) return;
+
         if (currentPlayerSelection === 1) {
             player1 = { ...character, pontos: 0 };
             p1SelectionText.textContent = player1.nome;
             card.classList.add('selected-p1');
             currentPlayerSelection = 2;
             selectionTitle.textContent = "PLAYER 2: CHOOSE YOUR RACER";
-            audioSelect.play();
-        } else if (currentPlayerSelection === 2 && character.nome !== player1.nome) {
+            playAudio(audioSelect);
+        } else if (currentPlayerSelection === 2) {
             player2 = { ...character, pontos: 0 };
             p2SelectionText.textContent = player2.nome;
             card.classList.add('selected-p2');
             currentPlayerSelection = 3;
-            audioSelect.play();
+            playAudio(audioSelect);
             setTimeout(startRace, 1500);
         }
     }
@@ -113,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else { logMessage += `💥 Empate! Ninguém marcou pontos.`; }
             }
             
-            if (scored) audioPoint.play();
+            if (scored) playAudio(audioPoint);
             raceLog.innerHTML = logMessage;
             updatePlayerDisplays();
             await esperar(4000);
@@ -130,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const winnerName = document.getElementById('winner-name');
         const announcement = document.getElementById('winner-announcement');
         
-        audioWin.play();
+        playAudio(audioWin);
 
         if (player1.pontos > player2.pontos) {
             winnerImg.src = player1.img;
